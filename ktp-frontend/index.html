@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistem Manajemen KTP | CRUD Application</title>
+  <meta name="description" content="Aplikasi CRUD Kartu Tanda Penduduk (KTP) berbasis web menggunakan Spring Boot API dan jQuery Ajax." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🪪</span>
+        <div>
+          <span class="logo-title">SiMaKTP</span>
+          <span class="logo-sub">Sistem Manajemen KTP</span>
+        </div>
+      </div>
+      <div class="header-meta">
+        <span id="current-date" class="date-badge"></span>
+        <span id="total-badge" class="count-badge">0 Data</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== TOAST NOTIFICATION ===== -->
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <!-- ===== MAIN LAYOUT ===== -->
+  <main class="main-layout">
+
+    <!-- ===== FORM PANEL ===== -->
+    <section class="panel form-panel" aria-labelledby="form-heading">
+      <div class="panel-header">
+        <h2 id="form-heading" class="panel-title">
+          <span id="form-icon">➕</span>
+          <span id="form-heading-text">Tambah Data KTP</span>
+        </h2>
+        <button id="btn-reset" class="btn btn-ghost btn-sm" type="button" title="Reset form">✕ Reset</button>
+      </div>
+
+      <form id="ktp-form" novalidate autocomplete="off">
+        <input type="hidden" id="ktp-id" />
+
+        <!-- Nomor KTP -->
+        <div class="form-group">
+          <label for="nomorKtp" class="form-label">Nomor KTP (NIK) <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔢</span>
+            <input
+              type="text"
+              id="nomorKtp"
+              name="nomorKtp"
+              class="form-input"
+              placeholder="Masukkan 16 digit NIK"
+              maxlength="16"
+              pattern="\d{16}"
+              inputmode="numeric"
+              required
+            />
+          </div>
+          <span class="form-hint" id="nomorKtp-hint">Harus tepat 16 digit angka</span>
+          <span class="form-error" id="nomorKtp-error"></span>
+        </div>
+
+        <!-- Nama Lengkap -->
+        <div class="form-group">
+          <label for="namaLengkap" class="form-label">Nama Lengkap <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input
+              type="text"
+              id="namaLengkap"
+              name="namaLengkap"
+              class="form-input"
+              placeholder="Nama sesuai KTP"
+              maxlength="255"
+              required
+            />
+          </div>
+          <span class="form-error" id="namaLengkap-error"></span>
+        </div>
+
+        <!-- Alamat -->
+        <div class="form-group">
+          <label for="alamat" class="form-label">Alamat <span class="required">*</span></label>
+          <div class="input-wrapper textarea-wrapper">
+            <span class="input-icon textarea-icon">📍</span>
+            <textarea
+              id="alamat"
+              name="alamat"
+              class="form-input form-textarea"
+              placeholder="Alamat tempat tinggal sesuai KTP"
+              maxlength="500"
+              rows="3"
+              required
+            ></textarea>
+          </div>
+          <span class="form-error" id="alamat-error"></span>
+        </div>
+
+        <!-- Tanggal Lahir -->
+        <div class="form-group">
+          <label for="tanggalLahir" class="form-label">Tanggal Lahir <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <span class="input-icon">📅</span>
+            <input
+              type="date"
+              id="tanggalLahir"
+              name="tanggalLahir"
+              class="form-input"
+              required
+            />
+          </div>
+          <span class="form-error" id="tanggalLahir-error"></span>
+        </div>
+
+        <!-- Jenis Kelamin -->
+        <div class="form-group">
+          <label for="jenisKelamin" class="form-label">Jenis Kelamin <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <span class="input-icon select-icon">⚧</span>
+            <select id="jenisKelamin" name="jenisKelamin" class="form-input form-select" required>
+              <option value="">-- Pilih Jenis Kelamin --</option>
+              <option value="Laki-laki">Laki-laki</option>
+              <option value="Perempuan">Perempuan</option>
+            </select>
+          </div>
+          <span class="form-error" id="jenisKelamin-error"></span>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button type="submit" id="btn-submit" class="btn btn-primary btn-full">
+            <span id="btn-submit-icon">💾</span>
+            <span id="btn-submit-text">Simpan Data KTP</span>
+            <span id="btn-submit-spinner" class="spinner hidden"></span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ===== TABLE PANEL ===== -->
+    <section class="panel table-panel" aria-labelledby="table-heading">
+      <div class="panel-header">
+        <h2 id="table-heading" class="panel-title">
+          📋 Daftar Data KTP
+        </h2>
+        <div class="table-actions">
+          <div class="search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input
+              type="search"
+              id="search-input"
+              class="search-input"
+              placeholder="Cari nama / NIK..."
+              aria-label="Cari data KTP"
+            />
+          </div>
+          <button id="btn-refresh" class="btn btn-ghost btn-sm" type="button" title="Refresh data">
+            🔄 Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats bar -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <span class="stat-label">Total KTP</span>
+          <span class="stat-value" id="stat-total">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Laki-laki</span>
+          <span class="stat-value" id="stat-lk">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Perempuan</span>
+          <span class="stat-value" id="stat-pr">0</span>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper" role="region" aria-label="Tabel Data KTP" tabindex="0">
+        <table class="ktp-table" id="ktp-table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Nomor KTP (NIK)</th>
+              <th scope="col">Nama Lengkap</th>
+              <th scope="col">Alamat</th>
+              <th scope="col">Tanggal Lahir</th>
+              <th scope="col">Jenis Kelamin</th>
+              <th scope="col">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="ktp-table-body">
+            <!-- Loading state -->
+            <tr id="loading-row">
+              <td colspan="7" class="state-cell">
+                <div class="loading-state">
+                  <div class="loading-spinner"></div>
+                  <span>Memuat data...</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty state -->
+      <div id="empty-state" class="empty-state hidden">
+        <div class="empty-icon">🗂️</div>
+        <h3>Belum Ada Data KTP</h3>
+        <p>Tambahkan data KTP pertama menggunakan form di sebelah kiri.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== CONFIRM MODAL ===== -->
+  <div id="confirm-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-box">
+      <div class="modal-icon">⚠️</div>
+      <h3 id="modal-title" class="modal-title">Konfirmasi Hapus</h3>
+      <p id="modal-message" class="modal-message">Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.</p>
+      <div class="modal-actions">
+        <button id="modal-cancel" class="btn btn-ghost">Batal</button>
+        <button id="modal-confirm" class="btn btn-danger">Ya, Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Script -->
+  <script src="app.js"></script>
+</body>
+</html>
