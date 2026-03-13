@@ -7,8 +7,8 @@ import com.ktp.service.KtpService;
 import com.ktp.util.KtpUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -18,22 +18,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * REST Controller for KTP CRUD operations.
- * Handles HTTP requests and delegates to KtpService.
- */
 @RestController
 @RequestMapping("/ktp")
-@RequiredArgsConstructor
-@Slf4j
 @CrossOrigin(origins = "*")
 public class KtpController {
 
+    private static final Logger log = LoggerFactory.getLogger(KtpController.class);
     private final KtpService ktpService;
 
-    /**
-     * POST /ktp - Create a new KTP record.
-     */
+    // Manual Constructor for dependency injection (Replacing Lombok
+    // @RequiredArgsConstructor)
+    public KtpController(KtpService ktpService) {
+        this.ktpService = ktpService;
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponseDto<KtpResponseDto>> createKtp(
             @Valid @RequestBody KtpRequestDto requestDto) {
@@ -49,9 +47,6 @@ public class KtpController {
         }
     }
 
-    /**
-     * GET /ktp - Get all KTP records.
-     */
     @GetMapping
     public ResponseEntity<ApiResponseDto<List<KtpResponseDto>>> getAllKtp() {
         log.info("GET /ktp - Fetching all KTPs");
@@ -59,9 +54,6 @@ public class KtpController {
         return ResponseEntity.ok(ApiResponseDto.success(KtpUtil.KTP_LIST_FETCHED, ktpList));
     }
 
-    /**
-     * GET /ktp/{id} - Get a KTP by ID.
-     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseDto<KtpResponseDto>> getKtpById(@PathVariable Integer id) {
         log.info("GET /ktp/{} - Fetching KTP by id", id);
@@ -75,9 +67,6 @@ public class KtpController {
         }
     }
 
-    /**
-     * PUT /ktp/{id} - Update a KTP by ID.
-     */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDto<KtpResponseDto>> updateKtp(
             @PathVariable Integer id,
@@ -97,9 +86,6 @@ public class KtpController {
         }
     }
 
-    /**
-     * DELETE /ktp/{id} - Delete a KTP by ID.
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponseDto<Void>> deleteKtp(@PathVariable Integer id) {
         log.info("DELETE /ktp/{} - Deleting KTP", id);
@@ -113,9 +99,6 @@ public class KtpController {
         }
     }
 
-    /**
-     * Handle validation errors from @Valid annotation.
-     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponseDto<List<String>>> handleValidationErrors(
             MethodArgumentNotValidException ex) {
@@ -129,9 +112,6 @@ public class KtpController {
                 .body(new ApiResponseDto<>(false, "Validasi gagal", errors));
     }
 
-    /**
-     * Handle unexpected exceptions.
-     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponseDto<Void>> handleGenericException(Exception ex) {
         log.error("Unexpected error: {}", ex.getMessage(), ex);

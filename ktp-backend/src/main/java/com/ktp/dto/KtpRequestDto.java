@@ -3,19 +3,8 @@ package com.ktp.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 
-/**
- * Data Transfer Object for KTP request payload.
- * Used for POST and PUT operations.
- */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class KtpRequestDto {
 
     @NotBlank(message = "Nomor KTP tidak boleh kosong")
@@ -35,4 +24,47 @@ public class KtpRequestDto {
 
     @NotBlank(message = "Jenis kelamin tidak boleh kosong")
     private String jenisKelamin;
+
+    public KtpRequestDto() {
+    }
+
+    public String getNomorKtp() {
+        return nomorKtp;
+    }
+
+    public void setNomorKtp(String nomorKtp) {
+        this.nomorKtp = nomorKtp;
+    }
+
+    public String getNamaLengkap() {
+        return namaLengkap;
+    }
+
+    public void setNamaLengkap(String namaLengkap) {
+        this.namaLengkap = namaLengkap;
+    }
+
+    public String getAlamat() {
+        return alamat;
+    }
+
+    public void setAlamat(String alamat) {
+        this.alamat = alamat;
+    }
+
+    public LocalDate getTanggalLahir() {
+        return tanggalLahir;
+    }
+
+    public void setTanggalLahir(LocalDate tanggalLahir) {
+        this.tanggalLahir = tanggalLahir;
+    }
+
+    public String getJenisKelamin() {
+        return jenisKelamin;
+    }
+
+    public void setJenisKelamin(String jenisKelamin) {
+        this.jenisKelamin = jenisKelamin;
+    }
 }

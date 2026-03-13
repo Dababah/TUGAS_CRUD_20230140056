@@ -7,42 +7,40 @@ import com.ktp.mapper.KtpMapper;
 import com.ktp.repository.KtpRepository;
 import com.ktp.service.KtpService;
 import com.ktp.util.KtpUtil;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Implementation of KtpService.
- * Handles all business logic for KTP CRUD operations.
- */
 @Service
-@RequiredArgsConstructor
-@Slf4j
 @Transactional
 public class KtpServiceImpl implements KtpService {
 
+    private static final Logger log = LoggerFactory.getLogger(KtpServiceImpl.class);
     private final KtpRepository ktpRepository;
     private final KtpMapper ktpMapper;
+
+    // Manual Constructor (Replacing Lombok @RequiredArgsConstructor)
+    public KtpServiceImpl(KtpRepository ktpRepository, KtpMapper ktpMapper) {
+        this.ktpRepository = ktpRepository;
+        this.ktpMapper = ktpMapper;
+    }
 
     @Override
     public KtpResponseDto createKtp(KtpRequestDto requestDto) {
         log.info("Creating KTP with nomorKtp: {}", requestDto.getNomorKtp());
 
-        // Validate nomor KTP format
         if (!KtpUtil.isValidNomorKtp(requestDto.getNomorKtp())) {
             throw new IllegalArgumentException("Format Nomor KTP tidak valid. Harus 16 digit angka.");
         }
 
-        // Validate jenis kelamin
         if (!KtpUtil.isValidJenisKelamin(requestDto.getJenisKelamin())) {
             throw new IllegalArgumentException("Jenis kelamin tidak valid. Pilih 'Laki-laki' atau 'Perempuan'.");
         }
 
-        // Check if nomorKtp already exists
         if (ktpRepository.existsByNomorKtp(requestDto.getNomorKtp())) {
             throw new IllegalArgumentException(
                     String.format(KtpUtil.KTP_NOMOR_EXISTED, requestDto.getNomorKtp()));
@@ -78,22 +76,18 @@ public class KtpServiceImpl implements KtpService {
     public KtpResponseDto updateKtp(Integer id, KtpRequestDto requestDto) {
         log.info("Updating KTP with id: {}", id);
 
-        // Validate nomor KTP format
         if (!KtpUtil.isValidNomorKtp(requestDto.getNomorKtp())) {
             throw new IllegalArgumentException("Format Nomor KTP tidak valid. Harus 16 digit angka.");
         }
 
-        // Validate jenis kelamin
         if (!KtpUtil.isValidJenisKelamin(requestDto.getJenisKelamin())) {
             throw new IllegalArgumentException("Jenis kelamin tidak valid. Pilih 'Laki-laki' atau 'Perempuan'.");
         }
 
-        // Find existing entity
         Ktp existingKtp = ktpRepository.findById(id)
                 .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException(
                         String.format(KtpUtil.KTP_NOT_FOUND, id)));
 
-        // Check if the new nomorKtp is already used by another record
         if (ktpRepository.existsByNomorKtpAndIdNot(requestDto.getNomorKtp(), id)) {
             throw new IllegalArgumentException(
                     String.format(KtpUtil.KTP_NOMOR_EXISTED, requestDto.getNomorKtp()));

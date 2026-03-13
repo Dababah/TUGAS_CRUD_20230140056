@@ -1,21 +1,10 @@
 package com.ktp.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 
-/**
- * Entity class representing a KTP (Kartu Tanda Penduduk / Indonesian ID Card).
- * Maps to the 'ktp' table in the 'spring' database.
- */
 @Entity
 @Table(name = "ktp")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Ktp {
 
     @Id
@@ -37,4 +26,66 @@ public class Ktp {
 
     @Column(name = "jenisKelamin", nullable = false, length = 20)
     private String jenisKelamin;
+
+    public Ktp() {
+    }
+
+    public Ktp(Integer id, String nomorKtp, String namaLengkap, String alamat, LocalDate tanggalLahir,
+            String jenisKelamin) {
+        this.id = id;
+        this.nomorKtp = nomorKtp;
+        this.namaLengkap = namaLengkap;
+        this.alamat = alamat;
+        this.tanggalLahir = tanggalLahir;
+        this.jenisKelamin = jenisKelamin;
+    }
+
+    // Getters and Setters
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getNomorKtp() {
+        return nomorKtp;
+    }
+
+    public void setNomorKtp(String nomorKtp) {
+        this.nomorKtp = nomorKtp;
+    }
+
+    public String getNamaLengkap() {
+        return namaLengkap;
+    }
+
+    public void setNamaLengkap(String namaLengkap) {
+        this.namaLengkap = namaLengkap;
+    }
+
+    public String getAlamat() {
+        return alamat;
+    }
+
+    public void setAlamat(String alamat) {
+        this.alamat = alamat;
+    }
+
+    public LocalDate getTanggalLahir() {
+        return tanggalLahir;
+    }
+
+    public void setTanggalLahir(LocalDate tanggalLahir) {
+        this.tanggalLahir = tanggalLahir;
+    }
+
+    public String getJenisKelamin() {
+        return jenisKelamin;
+    }
+
+    public void setJenisKelamin(String jenisKelamin) {
+        this.jenisKelamin = jenisKelamin;
+    }
 }
